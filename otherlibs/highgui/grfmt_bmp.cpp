@@ -102,6 +102,7 @@ bool  GrFmtBmpReader::ReadHeader()
         m_offset = m_strm.GetDWord();
 
         int  size = m_strm.GetDWord();
+	assert(size > 0);
 
         if( size >= 36 )
         {
