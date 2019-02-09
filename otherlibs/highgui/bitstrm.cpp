@@ -209,13 +209,18 @@ void  RBaseStream::SetPos( int pos )
 int  RBaseStream::GetPos()
 {
     assert( IsOpened() );
-    return m_block_pos - m_block_size + (int)(m_current - m_start);
+    int pos = validateToInt((m_current - m_start) + m_block_pos - m_block_size );
+    //assert(pos >= m_block_pos); // overflow check
+    assert(pos >= 0); // overflow check
+    return pos;
 }
 
 void  RBaseStream::Skip( int bytes )
 {
     assert( bytes >= 0 );
+    uchar* old = m_current;
     m_current += bytes;
+    assert(m_current >= old);
 }
 
 jmp_buf& RBaseStream::JmpBuf()
@@ -746,6 +751,9 @@ void  WBaseStream::WriteBlock()
 {
     int size = (int)(m_current - m_start);
     assert( m_file != 0 );
+    assert( IsOpened() );
+    if (size == 0 )
+        return;
 
     //fseek( m_file, m_block_pos, SEEK_SET );
     fwrite( m_start, 1, size, m_file );
